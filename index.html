@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>艾奥妮娅 - 行动卡版面设计 (可下载版)</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入html2canvas库用于将HTML元素转为图片 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- 引入Google Fonts以获得更具风格的字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Noto+Serif+SC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* 自定义字体和基础样式 */
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background-color: #1e293b; /* slate-800 */
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
+        }
+        .card-title-font {
+            font-family: 'Playfair Display', serif;
+        }
+        /* 定义卡牌3D悬浮效果的容器 */
+        .card-container {
+            perspective: 1000px;
+        }
+        /* 卡牌本体样式与过渡效果 */
+        .card {
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            transform-style: preserve-3d;
+        }
+        /* 仅当鼠标悬停在卡牌容器上时触发动画 */
+        .card-container:hover .card {
+            transform: translateY(-10px) rotateX(5deg) rotateY(-3deg) scale(1.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        /* 定义不同卡牌类别的边框颜色 */
+        .border-economy { border-color: #a16207; } /* yellow-700 */
+        .border-military { border-color: #475569; } /* slate-600 */
+        .border-magic { border-color: #7e22ce; } /* purple-700 */
+        .border-politics { border-color: #b91c1c; } /* red-700 */
+
+        /* 为可编辑区域添加视觉提示 */
+        [contenteditable="true"] {
+            outline: 2px solid transparent;
+            transition: outline 0.2s ease;
+            cursor: text;
+            padding: 2px;
+        }
+        [contenteditable="true"]:focus {
+            outline: 2px dashed #fbbf24; /* amber-400 */
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+        /* 避免在编辑时SVG图标被选中 */
+        [contenteditable="true"] svg {
+            pointer-events: none;
+        }
+        
+        /* 图片上传区域样式 */
+        .image-upload-container {
+            position: relative;
+        }
+        .image-upload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            border-radius: 0.375rem; /* rounded-md */
+        }
+        .image-upload-container:hover .image-upload-overlay {
+            opacity: 1;
+        }
+
+        /* 教程区域样式 */
+        .tutorial-section {
+            max-width: 800px;
+            margin: 4rem auto 0 auto;
+            padding: 2rem;
+            background-color: #334155; /* slate-700 */
+            color: #cbd5e1; /* slate-300 */
+            border-radius: 0.5rem;
+            border: 1px solid #475569; /* slate-600 */
+        }
+        .tutorial-section h2 {
+            font-family: 'Playfair Display', serif;
+            color: #f1f5f9; /* slate-100 */
+            font-size: 1.875rem;
+            border-bottom: 2px solid #475569;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .tutorial-section h3 {
+            font-family: 'Playfair Display', serif;
+            color: #e2e8f0; /* slate-200 */
+            font-size: 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .tutorial-section code {
+            background-color: #1e293b; /* slate-800 */
+            color: #fde047; /* yellow-300 */
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+        .tutorial-section kbd {
+            background-color: #475569;
+            color: #f1f5f9;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            border: 1px solid #64748b;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-800 text-slate-800 p-4 sm:p-8">
+
+    <header class="text-center mb-12">
+        <h1 class="text-4xl sm:text-5xl font-bold text-slate-100 card-title-font">艾奥妮娅行动卡设计器</h1>
+        <p class="text-slate-300 mt-2">提示：直接点击卡牌上的文字或图片区域即可进行编辑。详细教程请见页面底部。</p>
+    </header>
+
+    <!-- 卡牌画廊 -->
+    <main class="flex flex-wrap justify-center items-start gap-8 sm:gap-12">
+
+        <!-- 卡牌 1: 经济与建设 -->
+        <div class="card-wrapper flex flex-col items-center gap-4">
+            <div class="card-container">
+                <div id="card-1" class="card w-80 sm:w-96 bg-amber-50 rounded-lg shadow-lg border-4 border-double border-economy overflow-hidden">
+                    <header class="flex justify-between items-center p-3 bg-amber-100/50">
+                        <div contenteditable="true" class="ap-cost flex items-center justify-center w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-600 rounded-full shadow-md text-white font-bold text-2xl" title="AP成本" style="line-height: 3.5rem;">1.5</div>
+                        <h2 contenteditable="true" class="card-title-font text-xl text-center text-amber-900 font-bold px-2">《启动国家级建筑项目》</h2>
+                        <div class="category-icon w-12 h-12 flex items-center justify-center" title="经济与建设"><svg class="w-8 h-8 text-amber-800" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3.5a1 1 0 00.788 1.84L4 7.07V13a1 1 0 001 1h1a1 1 0 001-1V9.414l1.293 1.293a1 1 0 001.414-1.414L9 8.586V13a1 1 0 001 1h1a1 1 0 001-1V9.414l1.293 1.293a1 1 0 001.414-1.414L11 8.586V13a1 1 0 001 1h1a1 1 0 001-1V7.07l.606.303a1 1 0 00.788-1.84l-7-3.5zM5 14.07V15a1 1 0 001 1h1a1 1 0 001-1v-.93l-2-1.002V14.07zM9 14.07V15a1 1 0 001 1h1a1 1 0 001-1v-.93l-2-1.002V14.07z"></path></svg></div>
+                    </header>
+                    <div class="card-art p-2">
+                        <label for="upload-1" class="image-upload-container cursor-pointer block">
+                            <img id="preview-1" src="https://placehold.co/600x400/a16207/fef3c7?text=点击上传插画" alt="卡牌插画" class="w-full h-auto rounded-md border-2 border-amber-200" onerror="this.src='https://placehold.co/600x400/a16207/fef3c7?text=图片加载失败'">
+                            <div class="image-upload-overlay"><span>点击更换图片</span></div>
+                        </label>
+                        <input type="file" id="upload-1" class="hidden" accept="image/*" data-preview="preview-1">
+                    </div>
+                    <div class="pt-3 pb-5 px-4 text-sm">
+                        <div contenteditable="true" class="prerequisites bg-amber-100/70 p-2 rounded border-l-4 border-amber-600 mb-3"><p><strong class="font-bold">前置条件:</strong> 拥有足够的<strong class="text-amber-800">NDC</strong>; 拥有足够的<strong class="text-amber-800">财富</strong>; 已解锁建筑蓝图</p></div>
+                        <div contenteditable="true" class="effect-text mb-3 leading-relaxed"><p>授权启动一项新的国家级建筑的建造流程。项目将进入【国家工程队列】，并开始消耗<strong class="text-amber-800">工业力</strong>推进建设进度。</p></div>
+                        <hr class="border-amber-300 my-2">
+                        <div contenteditable="true" class="flavor-text italic text-amber-900/80"><p>“每一块砖石，都将成为帝国万年基业的奠基石。”</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-4 mt-4">
+                <button class="download-btn bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors" data-target="card-1" data-format="jpeg">下载JPEG</button>
+                <button class="download-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors" data-target="card-1" data-format="png">下载PNG</button>
+            </div>
+        </div>
+
+        <!-- 卡牌 2: 军事与国防 -->
+        <div class="card-wrapper flex flex-col items-center gap-4">
+            <div class="card-container">
+                <div id="card-2" class="card w-80 sm:w-96 bg-slate-200 rounded-lg shadow-lg border-4 border-double border-military overflow-hidden">
+                    <header class="flex justify-between items-center p-3 bg-slate-300/50">
+                        <div contenteditable="true" class="ap-cost flex items-center justify-center w-14 h-14 bg-gradient-to-br from-slate-500 to-slate-700 rounded-full shadow-md text-white font-bold text-2xl" title="AP成本" style="line-height: 3.5rem;">2.0</div>
+                        <h2 contenteditable="true" class="card-title-font text-xl text-center text-slate-900 font-bold px-2">《军事装备研发/定型》</h2>
+                        <div class="category-icon w-12 h-12 flex items-center justify-center" title="军事与国防"><svg class="w-8 h-8 text-slate-800" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 18.5a11.954 11.954 0 007.834-13.501l-4.95-2.475a1 1 0 00-1.022.032L10 4.132l-2.862-1.579a1 1 0 00-1.022-.032L2.166 4.999z" clip-rule="evenodd"></path><path fill-rule="evenodd" d="M10 1.5a1 1 0 00-1 1v12.5a1 1 0 102 0V2.5a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg></div>
+                    </header>
+                    <div class="card-art p-2">
+                         <label for="upload-2" class="image-upload-container cursor-pointer block">
+                            <img id="preview-2" src="https://placehold.co/600x400/475569/e2e8f0?text=点击上传插画" alt="卡牌插画" class="w-full h-auto rounded-md border-2 border-slate-300" onerror="this.src='https://placehold.co/600x400/475569/e2e8f0?text=图片加载失败'">
+                            <div class="image-upload-overlay"><span>点击更换图片</span></div>
+                        </label>
+                        <input type="file" id="upload-2" class="hidden" accept="image/*" data-preview="preview-2">
+                    </div>
+                    <div class="pt-3 pb-5 px-4 text-sm">
+                        <div contenteditable="true" class="prerequisites bg-slate-300/70 p-2 rounded border-l-4 border-slate-600 mb-3"><p><strong class="font-bold">前置条件:</strong> 已建成<strong class="text-slate-800">国家科学院</strong>; 拥有足够的<strong class="text-slate-800">财富</strong></p></div>
+                        <div contenteditable="true" class="effect-text mb-3 leading-relaxed"><p>授权军事研发机构，启动一次全新的<strong class="text-slate-800">SCU</strong>设计与定型流程。成功的研发将产生一份可供生产的全新【SCU蓝图卡】。</p></div>
+                        <hr class="border-slate-400 my-2">
+                        <div contenteditable="true" class="flavor-text italic text-slate-900/80"><p>“智慧与钢铁结合，方能铸就无敌之师。”</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-4 mt-4">
+                <button class="download-btn bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors" data-target="card-2" data-format="jpeg">下载JPEG</button>
+                <button class="download-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors" data-target="card-2" data-format="png">下载PNG</button>
+            </div>
+        </div>
+
+        <!-- 卡牌 3: 科技与魔术 -->
+        <div class="card-wrapper flex flex-col items-center gap-4">
+            <div class="card-container">
+                <div id="card-3" class="card w-80 sm:w-96 bg-purple-50 rounded-lg shadow-lg border-4 border-double border-magic overflow-hidden">
+                    <header class="flex justify-between items-center p-3 bg-purple-100/50">
+                        <div contenteditable="true" class="ap-cost flex items-center justify-center w-14 h-14 bg-gradient-to-br from-purple-500 to-violet-700 rounded-full shadow-md text-white font-bold text-2xl" title="AP成本" style="line-height: 3.5rem;">1.5</div>
+                        <h2 contenteditable="true" class="card-title-font text-xl text-center text-purple-900 font-bold px-2">《启动研究项目》</h2>
+                        <div class="category-icon w-12 h-12 flex items-center justify-center" title="科技与魔术"><svg class="w-8 h-8 text-purple-800" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg></div>
+                    </header>
+                    <div class="card-art p-2">
+                        <label for="upload-3" class="image-upload-container cursor-pointer block">
+                            <img id="preview-3" src="https://placehold.co/600x400/7e22ce/f3e8ff?text=点击上传插画" alt="卡牌插画" class="w-full h-auto rounded-md border-2 border-purple-200" onerror="this.src='https://placehold.co/600x400/7e22ce/f3e8ff?text=图片加载失败'">
+                            <div class="image-upload-overlay"><span>点击更换图片</span></div>
+                        </label>
+                        <input type="file" id="upload-3" class="hidden" accept="image/*" data-preview="preview-3">
+                    </div>
+                    <div class="pt-3 pb-5 px-4 text-sm">
+                        <div contenteditable="true" class="prerequisites bg-purple-100/70 p-2 rounded border-l-4 border-purple-600 mb-3"><p><strong class="font-bold">前置条件:</strong> 拥有可用的<strong class="text-purple-800">研究槽位</strong>; <strong class="text-purple-800">知识点</strong>储备 > 0</p></div>
+                        <div contenteditable="true" class="effect-text mb-3 leading-relaxed"><p>授权科研机构启动对一个指定的【研究领域】的探索。项目将占用一个研究槽位，并持续消耗<strong class="text-purple-800">知识点</strong>以累积“探索进度”。</p></div>
+                        <hr class="border-purple-300 my-2">
+                        <div contenteditable="true" class="flavor-text italic text-purple-900/80"><p>“向未知的迷雾中投下第一颗石子，静待真理的回响。”</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-4 mt-4">
+                <button class="download-btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors" data-target="card-3" data-format="jpeg">下载JPEG</button>
+                <button class="download-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors" data-target="card-3" data-format="png">下载PNG</button>
+            </div>
+        </div>
+
+        <!-- 卡牌 4: 政治与内政 -->
+        <div class="card-wrapper flex flex-col items-center gap-4">
+            <div class="card-container">
+                <div id="card-4" class="card w-80 sm:w-96 bg-red-50 rounded-lg shadow-lg border-4 border-double border-politics overflow-hidden">
+                    <header class="flex justify-between items-center p-3 bg-red-100/50">
+                        <div contenteditable="true" class="ap-cost flex items-center justify-center w-14 h-14 bg-gradient-to-br from-red-500 to-rose-700 rounded-full shadow-md text-white font-bold text-2xl" title="AP成本" style="line-height: 3.5rem;">3.0</div>
+                        <h2 contenteditable="true" class="card-title-font text-xl text-center text-red-900 font-bold px-2">《启动国家体制改革》</h2>
+                        <div class="category-icon w-12 h-12 flex items-center justify-center" title="政治与内政"><svg class="w-8 h-8 text-red-800" fill="currentColor" viewBox="0 0 20 20"><path d="M11.05 2.09a1.5 1.5 0 00-2.1 0L2.29 8.542a1.5 1.5 0 001.05 2.568h13.32a1.5 1.5 0 001.05-2.568L11.05 2.09z"></path><path fill-rule="evenodd" d="M2 12.5a1.5 1.5 0 011.5-1.5h13a1.5 1.5 0 011.5 1.5v1a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 012 13.5v-1zM3.5 15a1 1 0 00-1 1v1.5a1 1 0 001 1h13a1 1 0 001-1V16a1 1 0 00-1-1h-13z" clip-rule="evenodd"></path></svg></div>
+                    </header>
+                    <div class="card-art p-2">
+                        <label for="upload-4" class="image-upload-container cursor-pointer block">
+                            <img id="preview-4" src="https://placehold.co/600x400/b91c1c/fee2e2?text=点击上传插画" alt="卡牌插画" class="w-full h-auto rounded-md border-2 border-red-200" onerror="this.src='https://placehold.co/600x400/b91c1c/fee2e2?text=图片加载失败'">
+                            <div class="image-upload-overlay"><span>点击更换图片</span></div>
+                        </label>
+                        <input type="file" id="upload-4" class="hidden" accept="image/*" data-preview="preview-4">
+                    </div>
+                    <div class="pt-3 pb-5 px-4 text-sm">
+                        <div contenteditable="true" class="prerequisites bg-red-100/70 p-2 rounded border-l-4 border-red-600 mb-3"><p><strong class="font-bold">前置条件:</strong> 满足GM设定的<strong class="text-red-800">苛刻条件</strong> (如国家危机)</p></div>
+                        <div contenteditable="true" class="effect-text mb-3 leading-relaxed"><p>授权启动一项旨在根本性重塑国家某个【政体核心要素模块】的宏大国家项目。这是一个高风险、高投入的长期事件链。</p></div>
+                        <hr class="border-red-300 my-2">
+                        <div contenteditable="true" class="flavor-text italic text-red-900/80"><p>“重铸国魂的烈火已经点燃，吾辈或将永生，或将化为灰烬。”</p></div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-4 mt-4">
+                <button class="download-btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors" data-target="card-4" data-format="jpeg">下载JPEG</button>
+                <button class="download-btn bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors" data-target="card-4" data-format="png">下载PNG</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- 教程区域 -->
+    <section class="tutorial-section">
+        <h2>卡牌编辑器使用教程</h2>
+        <p>欢迎使用艾奥妮娅行动卡设计器！本工具允许您自由定制卡牌的每一个细节。请遵循以下指南进行操作。</p>
+        
+        <h3>1. 如何编辑文字</h3>
+        <p>操作非常简单：<strong>直接用鼠标点击您想修改的任何文字区域</strong>（如卡牌名称、AP成本、描述等），即可进入编辑模式。编辑完成后，点击卡牌外的任意区域即可退出编辑。</p>
+
+        <h3>2. 如何设置字体格式（加粗/斜体）</h3>
+        <p>在编辑文字时，您可以像使用常规文本编辑器一样，使用键盘快捷键来设置格式：</p>
+        <ul>
+            <li>- <strong>加粗:</strong> 选中文字后，按下 <kbd>Ctrl</kbd> + <kbd>B</kbd> (Windows/Linux) 或 <kbd>⌘</kbd> + <kbd>B</kbd> (Mac)。</li>
+            <li>- <em>斜体:</em> 选中文字后，按下 <kbd>Ctrl</kbd> + <kbd>I</kbd> (Windows/Linux) 或 <kbd>⌘</kbd> + <kbd>I</kbd> (Mac)。</li>
+        </ul>
+        <p>这些操作会自动为您选中的文字添加 <code><strong></code> (加粗) 或 <code><em></code> (斜体) 的HTML标签。</p>
+
+        <h3>3. 如何更改文字颜色与高级格式</h3>
+        <p>本编辑器支持富文本编辑，这意味着您可以直接**粘贴**带有格式的文本。这是更改颜色的最简单方法：</p>
+        <ol class="list-decimal list-inside space-y-2">
+            <li>在其他富文本编辑器（如Microsoft Word, Google Docs, 或网页）中，将您需要的文字设置好颜色。</li>
+            <li>复制这段带有颜色的文字。</li>
+            <li>在卡牌的编辑区域中，直接粘贴 (<kbd>Ctrl</kbd>+<kbd>V</kbd> / <kbd>⌘</kbd>+<kbd>V</kbd>)。浏览器会自动保留其颜色信息。</li>
+        </ol>
+
+        <h3>4. 如何上传卡牌插画</h3>
+        <p><strong>操作方法：</strong></p>
+        <ol class="list-decimal list-inside space-y-2">
+            <li>用鼠标**直接点击卡牌中部的图片区域**。</li>
+            <li>系统将自动弹出文件选择窗口。</li>
+            <li>在您的电脑中选择一张合适的图片，点击“打开”即可完成上传和替换。</li>
+        </ol>
+        <p class="mt-4"><strong>图片推荐规格：</strong></p>
+        <ul>
+            <li>- <strong>推荐长宽比:</strong> <strong>3 : 2</strong> (例如 600像素 宽 × 400像素 高)。保持这个比例可以确保图片在卡牌中不变形。</li>
+            <li>- <strong>推荐文件大小:</strong> 建议小于 <strong>1MB</strong>。过大的图片可能会导致加载缓慢。</li>
+            <li>- <strong>支持格式:</strong> 常用的图片格式如 JPG, PNG, GIF, WEBP 等均可。</li>
+        </ul>
+
+        <h3>5. 如何下载您设计的卡牌</h3>
+        <p><strong>操作方法：</strong></p>
+        <ol class="list-decimal list-inside space-y-2">
+            <li>完成您的所有编辑（文字、格式、图片）。</li>
+            <li>点击您想下载的卡牌下方对应的 <strong>“下载JPEG”</strong> 或 <strong>“下载PNG”</strong> 按钮。</li>
+            <li>浏览器将自动开始下载一张包含您所有修改的高质量图片。</li>
+        </ol>
+        <p class="mt-4"><strong>格式选择建议：</strong></p>
+        <ul>
+            <li>- <code>JPEG</code>: 文件体积更小，适合在网络上快速分享，但画质略有损失。</li>
+            <li>- <code>PNG</code>: 无损画质，效果最佳，尤其适合需要保留高质量细节或进行二次编辑的场景。</li>
+        </ul>
+        
+        <h3>6. 终极技巧：直接编辑HTML代码</h3>
+        <p>如果您想获得像素级的精确控制，可以直接编辑HTML代码。由于浏览器安全限制，您不能直接在编辑框里输入HTML代码并让它渲染。但您可以通过以下步骤实现：</p>
+        <ol class="list-decimal list-inside space-y-2">
+            <li>在卡牌的编辑区域，输入您想要的纯文本。</li>
+            <li>用鼠标右键点击该编辑区域，选择 <strong>“检查”</strong> 或 <strong>“审查元素”</strong>，打开浏览器开发者工具。</li>
+            <li>在开发者工具中，您会看到高亮显示了您正在编辑的HTML元素（通常是一个 <code><p></code> 或 <code><h2></code> 标签）。</li>
+            <li>双击该元素的内容，您就可以直接在其中编写HTML代码了。例如，您可以将 <code>一段文字</code> 修改为 <code>一段<font color="red">红色</font>的文字</code>。</li>
+            <li>修改完成后，按Enter键确认。您会看到卡牌上的文字立即按您的代码更新了样式。</li>
+        </ol>
+        <p class="mt-4"><strong>示例代码：</strong></p>
+        <p>要将“工业力”三个字变为红色，您可以找到对应的文本，将其修改为：<code>消耗<strong style="color: #b91c1c;">工业力</strong>推进建设进度。</code></p>
+        <p>祝您设计愉快，指挥官！</p>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- 图片上传逻辑 ---
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => {
+                input.addEventListener('change', (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        const previewId = event.target.dataset.preview;
+                        const previewImage = document.getElementById(previewId);
+
+                        if (previewImage) {
+                            reader.onload = function(e) {
+                                previewImage.src = e.target.result;
+                            }
+                            reader.readAsDataURL(file);
+                        }
+                    }
+                });
+            });
+
+            // --- 卡牌下载逻辑 ---
+            const downloadButtons = document.querySelectorAll('.download-btn');
+            downloadButtons.forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const targetId = event.target.dataset.target;
+                    const format = event.target.dataset.format;
+                    const cardElement = document.getElementById(targetId);
+                    
+                    if (cardElement) {
+                        const originalText = button.textContent;
+                        button.textContent = '正在生成...';
+                        button.disabled = true;
+
+                        try {
+                            // 使用html2canvas进行截图
+                            const canvas = await html2canvas(cardElement, {
+                                allowTaint: true,
+                                useCORS: true,
+                                scale: 2, // 提高分辨率
+                                backgroundColor: null // 对于PNG，允许透明背景
+                            });
+                            
+                            const cardTitleElement = cardElement.querySelector('h2');
+                            let cardTitle = cardTitleElement ? cardTitleElement.textContent.trim() : 'Aionia-Card';
+                            // 清理文件名中的无效字符
+                            cardTitle = cardTitle.replace(/[《》/\\?%*:|"<>]/g, '');
+                            
+                            const mimeType = `image/${format}`;
+                            const fileExtension = `.${format}`;
+
+                            const link = document.createElement('a');
+                            link.download = `${cardTitle}${fileExtension}`;
+                            link.href = canvas.toDataURL(mimeType, format === 'jpeg' ? 0.9 : 1.0);
+                            link.click();
+                        } catch (error) {
+                            console.error('卡牌生成失败:', error);
+                            alert('抱歉，生成卡牌图片时遇到错误。请检查浏览器控制台获取更多信息。');
+                        } finally {
+                            button.textContent = originalText;
+                            button.disabled = false;
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
